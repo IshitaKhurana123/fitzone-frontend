@@ -68,4 +68,19 @@ form { padding: 25px; }
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
+
+}
+/* Add these rules at the end of styles.css */
+
+body {
+  opacity: 0; /* Hide the body initially */
+  transition: opacity 0.5s ease-in-out;
+}
+
+body.loaded {
+  opacity: 1; /* Fade the body in when ready */
+}
+
+.sidebar {
+  transform: translateX(-100%); /* Start sidebar off-screen */
 }
