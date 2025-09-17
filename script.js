@@ -1,49 +1,29 @@
-// ❗ IMPORTANT: When you deploy, change this to your Render backend URL
-const API_URL = 'https://fitzone-ekkm.onrender.com/api';
+const API_URL = 'http://localhost:5000/api'; // Change to your deployed URL when ready
 let currentEditId = null;
+
+// Define plan details here to calculate revenue
+const plansData = {
+    basic: { name: 'Basic', price: 10000 },
+    premium: { name: 'Premium', price: 18000 },
+    vip: { name: 'VIP', price: 25000 }
+};
 
 document.addEventListener("DOMContentLoaded", () => {
     initializeApp();
     setupEventListeners();
 });
 
-// Replace the entire initializeApp function with this one
-
 async function initializeApp() {
-    // Animate the body to fade in
     document.body.classList.add('loaded');
-
-    // Animate the sidebar to slide into view
-    gsap.to(".sidebar", { 
-        duration: 1, 
-        x: 0, // Animate to its final position
-        ease: "power2.out" 
-    });
-
-    // Animate the header
-    gsap.from(".header", { 
-        duration: 1, 
-        y: -100, 
-        opacity: 0, 
-        ease: "power2.out", 
-        delay: 0.5 
-    });
-
-    // Animate the stat cards
-    gsap.from(".stat-card", { 
-        duration: 0.8, 
-        y: 50, 
-        opacity: 0, 
-        stagger: 0.2, 
-        ease: "back.out(1.7)", 
-        delay: 0.8 
-    });
+    gsap.to(".sidebar", { duration: 1, x: 0, ease: "power2.out" });
+    gsap.from(".header", { duration: 1, y: -100, opacity: 0, ease: "power2.out", delay: 0.5 });
+    gsap.from(".stat-card", { duration: 0.8, y: 50, opacity: 0, stagger: 0.2, ease: "back.out(1.7)", delay: 0.8 });
     
-    // Load the data after starting animations
     await loadMembers();
     await loadTrainers();
     await updateDashboard();
 }
+
 function setupEventListeners() {
     document.querySelectorAll(".nav-link").forEach(link => link.addEventListener("click", e => {
         e.preventDefault();
@@ -116,7 +96,6 @@ async function handleMemberSubmit(e) {
 }
 
 async function editMember(id) {
-    // We can't just fetch one member yet, so we'll find it from the full list
     const members = await apiRequest('/members');
     if (!members) return;
     const member = members.find(m => m._id === id);
@@ -189,8 +168,20 @@ async function deleteTrainer(id) {
 async function updateDashboard() {
     const members = await apiRequest('/members');
     const trainers = await apiRequest('/trainers');
-    if (members) document.getElementById("total-members").textContent = members.length;
-    if (trainers) document.getElementById("total-trainers").textContent = trainers.filter(t => t.status === 'active').length;
+    
+    if (members) {
+        document.getElementById("total-members").textContent = members.length;
+        
+        const totalRevenue = members
+            .filter(member => member.status === 'active' && plansData[member.plan])
+            .reduce((sum, member) => sum + plansData[member.plan].price, 0);
+
+        document.getElementById("total-revenue").textContent = `₹${totalRevenue.toLocaleString('en-IN')}`;
+    }
+    
+    if (trainers) {
+        document.getElementById("total-trainers").textContent = trainers.filter(t => t.status === 'active').length;
+    }
 }
 
 function showPage(pageId) {
@@ -218,9 +209,4 @@ function openTrainerModal() {
     document.getElementById("trainer-form").reset();
     document.getElementById('trainer-modal').style.display = 'block'; 
 }
-
 function closeTrainerModal() { document.getElementById('trainer-modal').style.display = 'none'; }
-
-
-
-
