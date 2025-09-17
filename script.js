@@ -1,5 +1,5 @@
 // ❗ IMPORTANT: When you deploy, change this to your Render backend URL
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://fitzone-ekkm.onrender.com';
 let currentEditId = null;
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -193,4 +193,5 @@ function openTrainerModal() {
 }
 
 function closeTrainerModal() { document.getElementById('trainer-modal').style.display = 'none'; }
+
 
