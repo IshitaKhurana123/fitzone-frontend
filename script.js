@@ -7,16 +7,43 @@ document.addEventListener("DOMContentLoaded", () => {
     setupEventListeners();
 });
 
+// Replace the entire initializeApp function with this one
+
 async function initializeApp() {
+    // Animate the body to fade in
+    document.body.classList.add('loaded');
+
+    // Animate the sidebar to slide into view
+    gsap.to(".sidebar", { 
+        duration: 1, 
+        x: 0, // Animate to its final position
+        ease: "power2.out" 
+    });
+
+    // Animate the header
+    gsap.from(".header", { 
+        duration: 1, 
+        y: -100, 
+        opacity: 0, 
+        ease: "power2.out", 
+        delay: 0.5 
+    });
+
+    // Animate the stat cards
+    gsap.from(".stat-card", { 
+        duration: 0.8, 
+        y: 50, 
+        opacity: 0, 
+        stagger: 0.2, 
+        ease: "back.out(1.7)", 
+        delay: 0.8 
+    });
+    
+    // Load the data after starting animations
     await loadMembers();
     await loadTrainers();
     await updateDashboard();
-
-    gsap.from(".sidebar", { duration: 1, x: -250, ease: "power2.out" });
-    gsap.from(".header", { duration: 1, y: -100, opacity: 0, ease: "power2.out", delay: 0.5 });
-    gsap.from(".stat-card", { duration: 0.8, y: 50, opacity: 0, stagger: 0.2, ease: "back.out(1.7)", delay: 1 });
 }
-
 function setupEventListeners() {
     document.querySelectorAll(".nav-link").forEach(link => link.addEventListener("click", e => {
         e.preventDefault();
@@ -193,6 +220,7 @@ function openTrainerModal() {
 }
 
 function closeTrainerModal() { document.getElementById('trainer-modal').style.display = 'none'; }
+
 
 
 
