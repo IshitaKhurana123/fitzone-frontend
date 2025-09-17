@@ -486,7 +486,7 @@ form { padding: 25px; }
 
 /* Quote container changes */
 .quote-container {
-    margin-top: 40px;
+    margin-top: 40px; /* This is the fix to add space */
     padding: 30px;
     background: #2d2f34;
     border-radius: 10px;
