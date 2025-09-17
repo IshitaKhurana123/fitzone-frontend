@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitZone - Gym Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-dumbbell"></i> FitZone</h2>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#dashboard" class="nav-link active" data-page="dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a></li>
+                <li><a href="#members" class="nav-link" data-page="members"><i class="fas fa-users"></i> Members</a></li>
+                <li><a href="#trainers" class="nav-link" data-page="trainers"><i class="fas fa-user-tie"></i> Trainers</a></li>
+                <li><a href="#equipment" class="nav-link" data-page="equipment"><i class="fas fa-tools"></i> Equipment</a></li>
+                <li><a href="#plans" class="nav-link" data-page="plans"><i class="fas fa-credit-card"></i> Plans</a></li>
+                <li><a href="#reports" class="nav-link" data-page="reports"><i class="fas fa-file-alt"></i> Reports</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle"><i class="fas fa-bars"></i></button>
+                    <h1 id="page-title">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <span>Welcome, Admin</span>
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div id="dashboard" class="page active" data-aos="fade-in">
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-info"><h3 id="total-members">0</h3><p>Total Members</p></div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-tie"></i></div><div class="stat-info"><h3 id="total-trainers">0</h3><p>Active Trainers</p></div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-tools"></i></div><div class="stat-info"><h3 id="total-equipment">0</h3><p>Equipment Items</p></div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-dollar-sign"></i></div><div class="stat-info"><h3 id="monthly-revenue">$0</h3><p>Monthly Revenue</p></div></div>
+                </div>
+            </div>
+
+            <div id="members" class="page">
+                <div class="page-header"><h2>Member Management</h2><button class="btn btn-primary" onclick="openMemberModal()"><i class="fas fa-plus"></i> Add Member</button></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Plan</th><th>Status</th><th>Actions</th></tr></thead><tbody id="members-table"></tbody></table></div>
+            </div>
+
+            <div id="trainers" class="page">
+                <div class="page-header"><h2>Trainer Management</h2><button class="btn btn-primary" onclick="openTrainerModal()"><i class="fas fa-plus"></i> Add Trainer</button></div>
+                <div class="table-container"><table class="data-table"><thead><tr><th>ID</th><th>Name</th><th>Specialization</th><th>Experience</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead><tbody id="trainers-table"></tbody></table></div>
+            </div>
+            
+            <div id="equipment" class="page"><div class="page-header"><h2>Equipment (Coming Soon)</h2></div></div>
+            <div id="plans" class="page"><div class="page-header"><h2>Plans (Coming Soon)</h2></div></div>
+            <div id="reports" class="page"><div class="page-header"><h2>Reports (Coming Soon)</h2></div></div>
+        </main>
+    </div>
+
+    <div id="member-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3 id="member-modal-title">Add Member</h3><span class="close" onclick="closeMemberModal()">&times;</span></div>
+            <form id="member-form">
+                <div class="form-group"><label for="member-name">Full Name</label><input type="text" id="member-name" required></div>
+                <div class="form-group"><label for="member-email">Email</label><input type="email" id="member-email" required></div>
+                <div class="form-group"><label for="member-phone">Phone</label><input type="tel" id="member-phone" required></div>
+                <div class="form-group"><label for="member-plan">Membership Plan</label><select id="member-plan" required><option value="">Select Plan</option><option value="basic">Basic</option><option value="premium">Premium</option><option value="vip">VIP</option></select></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeMemberModal()">Cancel</button><button type="submit" class="btn btn-primary">Save Member</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="trainer-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Add Trainer</h3><span class="close" onclick="closeTrainerModal()">&times;</span></div>
+            <form id="trainer-form">
+                <div class="form-group"><label for="trainer-name">Full Name</label><input type="text" id="trainer-name" required></div>
+                <div class="form-group"><label for="trainer-specialization">Specialization</label><input type="text" id="trainer-specialization" required></div>
+                <div class="form-group"><label for="trainer-experience">Experience (years)</label><input type="number" id="trainer-experience" required></div>
+                <div class="form-group"><label for="trainer-phone">Phone</label><input type="tel" id="trainer-phone" required></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeTrainerModal()">Cancel</button><button type="submit" class="btn btn-primary">Save Trainer</button></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>AOS.init();</script>
+    <script src="script.js"></script>
+</body>
+</html>
