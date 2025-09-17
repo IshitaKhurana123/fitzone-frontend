@@ -89,3 +89,29 @@ form { padding: 25px; }
 body { opacity: 0; transition: opacity 0.5s ease-in-out; }
 body.loaded { opacity: 1; }
 .sidebar { transform: translateX(-100%); }
+/* styles.css */
+
+/* Add this at the end of the file */
+
+.quote-container {
+  margin-top: 40px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.quote-text {
+  font-size: 1.5rem;
+  font-style: italic;
+  color: #333;
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+.quote-author {
+  font-size: 1rem;
+  color: #555;
+  font-weight: 500;
+}
