@@ -486,26 +486,28 @@ form { padding: 25px; }
 
 /* Quote container changes */
 .quote-container {
-    margin-top: 40px; /* This is the fix to add space */
+    margin-top: 40px;
     padding: 30px;
-    background: #2d2f34;
+    background: transparent;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: none;
     text-align: center;
 }
 
 .quote-text {
     font-size: 1.5rem;
     font-style: italic;
-    color: #f5f5f5;
+    color: white;
     margin-bottom: 15px;
     line-height: 1.4;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 .quote-author {
     font-size: 1rem;
-    color: #ccc;
+    color: white;
     font-weight: 500;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 @media (max-width: 768px) {
