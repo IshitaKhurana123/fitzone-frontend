@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5000/api'; // Change to your deployed URL when ready
+const API_URL = 'https://fitzone-ekkm.onrender.com/api'; // Change to your deployed URL when ready
 let currentEditId = null;
 
 // Define plan details here to calculate revenue
@@ -210,3 +210,4 @@ function openTrainerModal() {
     document.getElementById('trainer-modal').style.display = 'block'; 
 }
 function closeTrainerModal() { document.getElementById('trainer-modal').style.display = 'none'; }
+
