@@ -23,10 +23,9 @@ body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background-
 .stat-card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); display: flex; align-items: center; transition: transform 0.3s ease, box-shadow 0.3s ease; }
 .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); }
 .stat-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-size: 1.5rem; color: white; }
-.stat-card:nth-child(1) .stat-icon { background: #4caf50; }
-.stat-card:nth-child(2) .stat-icon { background: #2196f3; }
-.stat-card:nth-child(3) .stat-icon { background: #ff9800; }
-.stat-card:nth-child(4) .stat-icon { background: #9c27b0; }
+.stats-grid .stat-card:nth-child(1) .stat-icon { background: #4caf50; }
+.stats-grid .stat-card:nth-child(2) .stat-icon { background: #2196f3; }
+.stats-grid .stat-card:nth-child(3) .stat-icon { background: #9c27b0; }
 .stat-info h3 { font-size: 2rem; font-weight: 600; margin-bottom: 5px; }
 .stat-info p { color: #666; font-size: 0.9rem; }
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
@@ -57,30 +56,36 @@ form { padding: 25px; }
 .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2); }
 .form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px; }
+
+/* Styles for Equipment Page */
+.equipment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.equipment-item { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); text-align: center; transition: transform 0.3s ease; }
+.equipment-item:hover { transform: translateY(-5px); }
+.equipment-item img { width: 100%; height: 200px; object-fit: cover; }
+.equipment-item h3 { padding: 15px; font-size: 1.2rem; }
+
+/* Styles for Plans Page */
+.plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; align-items: start; }
+.plan-card { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); text-align: center; border: 2px solid transparent; transition: all 0.3s ease; }
+.plan-card.popular { border-color: #667eea; position: relative; transform: scale(1.05); }
+.plan-card:hover { transform: translateY(-5px); }
+.popular-badge { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: #667eea; color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+.plan-card h3 { font-size: 1.5rem; margin-bottom: 15px; }
+.plan-price { font-size: 2.5rem; font-weight: 600; color: #667eea; margin-bottom: 20px; }
+.plan-price small { font-size: 1rem; color: #666; }
+.plan-features { list-style: none; text-align: left; margin-bottom: 25px; }
+.plan-features li { padding: 8px 0; color: #333; }
+.plan-features li i { margin-right: 10px; width: 20px; }
+.plan-features li .fa-check { color: #4caf50; }
+.plan-features li .fa-times { color: #dc3545; }
+
 @media (max-width: 768px) {
   .sidebar { transform: translateX(-100%); }
   .sidebar.active { transform: translateX(0); }
   .main-content { margin-left: 0; }
   .menu-toggle { display: block; }
 }
-.main-content {
-  background-image: linear-gradient(rgba(245, 245, 245, 0.9), rgba(245, 245, 245, 0.9)), url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=2575&auto=format&fit=crop');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-
-}
-/* Add these rules at the end of styles.css */
-
-body {
-  opacity: 0; /* Hide the body initially */
-  transition: opacity 0.5s ease-in-out;
-}
-
-body.loaded {
-  opacity: 1; /* Fade the body in when ready */
-}
-
-.sidebar {
-  transform: translateX(-100%); /* Start sidebar off-screen */
-}
+.main-content { background-image: linear-gradient(rgba(245, 245, 245, 0.9), rgba(245, 245, 245, 0.9)), url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=2575&auto=format&fit=crop'); background-size: cover; background-position: center; background-attachment: fixed; }
+body { opacity: 0; transition: opacity 0.5s ease-in-out; }
+body.loaded { opacity: 1; }
+.sidebar { transform: translateX(-100%); }
