@@ -114,26 +114,40 @@ async function initializeApp() {
     setupAppEventListeners();
 }
 
+/**
+ * MODIFIED FUNCTION
+ * This function now builds the navigation links in the sidebar
+ * based on the user's role, as per your requirements.
+ */
 function renderNav() {
+    // Start with the Dashboard link, common to all roles.
     let links = navLinkTemplate('dashboard-page', 'fas fa-chart-bar', 'Dashboard');
     
     switch (state.role) {
         case 'admin':
+            // Admin: Member & Trainer Management, Equipment, and Plans
             links += navLinkTemplate('members-page', 'fas fa-users', 'Members');
             links += navLinkTemplate('trainers-page', 'fas fa-user-tie', 'Trainers');
+            links += navLinkTemplate('equipment-page', 'fas fa-tools', 'Equipment');
+            links += navLinkTemplate('plans-page', 'fas fa-tasks', 'Plans');
             break;
         case 'member':
+            // Member: Payment, Equipment, and Plans
             links += navLinkTemplate('payment-page', 'fas fa-credit-card', 'Payment');
+            links += navLinkTemplate('equipment-page', 'fas fa-tools', 'Equipment');
+            links += navLinkTemplate('plans-page', 'fas fa-tasks', 'Plans');
             break;
         case 'trainer':
+            // Trainer: Salary, Equipment, and Plans
             links += navLinkTemplate('salary-page', 'fas fa-money-bill-wave', 'Salary');
+            links += navLinkTemplate('equipment-page', 'fas fa-tools', 'Equipment');
+            links += navLinkTemplate('plans-page', 'fas fa-tasks', 'Plans');
             break;
     }
 
-    links += navLinkTemplate('equipment-page', 'fas fa-tools', 'Equipment');
-    links += navLinkTemplate('plans-page', 'fas fa-tasks', 'Plans');
     navLinks.innerHTML = links;
 }
+
 
 function setupAppEventListeners() {
     navLinks.addEventListener('click', (e) => {
@@ -272,11 +286,11 @@ async function loadAndDisplayTrainers() {
 
 // --- MEMBER/TRAINER-SPECIFIC PAGES ---
 function renderMemberPayment() {
-    document.getElementById('payment-page').innerHTML = `<div class="info-card"><h3>My Payment Status</h3><p>Your membership status is currently: <strong>${state.user.paymentStatus}</strong></p></div>`;
+    document.getElementById('payment-page').innerHTML = `<div class="info-card"><h3>My Payment Status</h3><p>Your membership status is currently: <strong>${state.user.paymentStatus}</strong>.</p><p>To pay your fees, please visit the front desk.</p></div>`;
 }
 
 function renderTrainerSalary() {
-    document.getElementById('salary-page').innerHTML = `<div class="info-card"><h3>My Salary Status</h3><p>Your current salary status is: <strong>${state.user.salaryStatus}</strong></p></div>`;
+    document.getElementById('salary-page').innerHTML = `<div class="info-card"><h3>My Salary Status</h3><p>Your current salary status is: <strong>${state.user.salaryStatus}</strong>.</p><p>For a detailed salary history, please contact the administration.</p></div>`;
 }
 
 function renderEquipment() {
@@ -494,4 +508,3 @@ async function deleteTrainer(id) {
         }
     }
 }
-
