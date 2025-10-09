@@ -1,5 +1,13 @@
-const API_URL = 'https://fitzone-backend-2elo.onrender.com/api'; // This will be your deployed backend URL
+// Use a placeholder for the API URL which will be replaced during deployment
+const API_URL = 'https://fitzone-backend-2elo.onrender.com/api'; 
 let currentEditId = null;
+
+// Define plan details here to calculate revenue
+const plansData = {
+    basic: { name: 'Basic', price: 10000 },
+    premium: { name: 'Premium', price: 18000 },
+    vip: { name: 'VIP', price: 25000 }
+};
 
 // --- STATE MANAGEMENT ---
 let state = {
@@ -22,7 +30,7 @@ const pageTitle = document.getElementById('page-title');
 const welcomeMessage = document.getElementById('welcome-message');
 
 // --- TEMPLATES ---
-const navLinkTemplate = (page, icon, text) => `<li><a href="#" class="nav-link" data-page="${page}-page"><i class="${icon}"></i> ${text}</a></li>`;
+const navLinkTemplate = (pageId, icon, text) => `<li><a href="#" class="nav-link" data-page="${pageId}"><i class="${icon}"></i> ${text}</a></li>`;
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -88,7 +96,7 @@ async function handleLogin(e) {
 function logout() {
     state = { token: null, user: null, role: null, members: [], trainers: [] };
     localStorage.clear();
-    showLoginPage();
+    location.reload(); // Easiest way to reset the app state
 }
 
 // --- APP & UI LOGIC ---
@@ -107,23 +115,23 @@ async function initializeApp() {
 }
 
 function renderNav() {
-    let links = navLinkTemplate('dashboard', 'fas fa-chart-bar', 'Dashboard');
+    let links = navLinkTemplate('dashboard-page', 'fas fa-chart-bar', 'Dashboard');
     
     switch (state.role) {
         case 'admin':
-            links += navLinkTemplate('members', 'fas fa-users', 'Members');
-            links += navLinkTemplate('trainers', 'fas fa-user-tie', 'Trainers');
+            links += navLinkTemplate('members-page', 'fas fa-users', 'Members');
+            links += navLinkTemplate('trainers-page', 'fas fa-user-tie', 'Trainers');
             break;
         case 'member':
-            links += navLinkTemplate('payment', 'fas fa-credit-card', 'Payment');
+            links += navLinkTemplate('payment-page', 'fas fa-credit-card', 'Payment');
             break;
         case 'trainer':
-            links += navLinkTemplate('salary', 'fas fa-money-bill-wave', 'Salary');
+            links += navLinkTemplate('salary-page', 'fas fa-money-bill-wave', 'Salary');
             break;
     }
 
-    links += navLinkTemplate('equipment', 'fas fa-tools', 'Equipment');
-    links += navLinkTemplate('plans', 'fas fa-tasks', 'Plans');
+    links += navLinkTemplate('equipment-page', 'fas fa-tools', 'Equipment');
+    links += navLinkTemplate('plans-page', 'fas fa-tasks', 'Plans');
     navLinks.innerHTML = links;
 }
 
@@ -186,15 +194,15 @@ async function renderDashboard() {
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-check"></i></div><div class="stat-info"><h3>${activeMembers}</h3><p>Active Members</p></div></div>
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-tie"></i></div><div class="stat-info"><h3>${state.trainers.length}</h3><p>Total Trainers</p></div></div>
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-clock"></i></div><div class="stat-info"><h3>${activeTrainers}</h3><p>Active Trainers</p></div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-rupee-sign"></i></div><div class="stat-info"><h3>₹${calculateRevenue()}</h3><p>Yearly Revenue</p></div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-rupee-sign"></i></div><div class="stat-info"><h3>₹${calculateRevenue().toLocaleString('en-IN')}</h3><p>Yearly Revenue</p></div></div>
                 </div>`;
             break;
         case 'member':
-            const paymentReminder = state.user.paymentStatus === 'Unpaid' ? `<p class="error-message">Your payment is due. Please visit the Payment page.</p>` : `<p style="color: #4caf50;">Your membership is active and paid.</p>`;
+            const paymentReminder = state.user.paymentStatus === 'Unpaid' ? `<p class="error-message" style="height: auto;">Your payment is due. Please visit the Payment page.</p>` : `<p style="color: #4caf50;">Your membership is active and paid.</p>`;
             const trainerInfo = state.user.assignedTrainer ? `<h3>${state.user.assignedTrainer.name}</h3><p>${state.user.assignedTrainer.specialization} Specialist</p><p>Contact: ${state.user.assignedTrainer.phone}</p>` : `<h3>No Trainer Assigned</h3><p>Please contact admin for assistance.</p>`;
             content = `
                 <div class="dashboard-grid">
-                    <div class="info-card"><h3>My Attendance</h3><p>${state.user.attendance} Days</p></div>
+                    <div class="info-card"><h3>My Attendance</h3><p class="stat-info-h3">${state.user.attendance} Days</p></div>
                     <div class="info-card"><h3>Payment Status</h3>${paymentReminder}</div>
                     <div class="info-card"><h3>Assigned Trainer</h3>${trainerInfo}</div>
                 </div>`;
@@ -207,7 +215,7 @@ async function renderDashboard() {
                 : `<div class="info-card"><p>No members are currently assigned to you.</p></div>`;
             content = `
                 <div class="dashboard-grid">
-                    <div class="info-card"><h3>My Attendance</h3><p>${state.user.attendance} Days</p></div>
+                    <div class="info-card"><h3>My Attendance</h3><p class="stat-info-h3">${state.user.attendance} Days</p></div>
                     <div class="info-card"><h3>Salary Status</h3><p>Your salary is currently <strong>${state.user.salaryStatus}</strong>.</p></div>
                 </div>
                 <div class="page-header" style="margin-top: 30px;"><h2>Assigned Members</h2></div>
@@ -262,132 +270,228 @@ async function loadAndDisplayTrainers() {
 }
 
 
-// --- OTHER ROLE PAGES ---
+// --- MEMBER/TRAINER-SPECIFIC PAGES ---
 function renderMemberPayment() {
-    const paymentPage = document.getElementById('payment-page');
-    const statusMessage = state.user.paymentStatus === 'Paid' ? `Your membership is paid and up to date.` : `Your payment is currently due.`;
-    paymentPage.innerHTML = `<div class="info-card"><h3>Payment Status</h3><p>${statusMessage}</p>${state.user.paymentStatus === 'Unpaid' ? `<button class="btn btn-primary" style="margin-top: 20px;" onclick="alert('Payment gateway integration coming soon!')">Pay Now</button>`: ''}</div>`;
+    document.getElementById('payment-page').innerHTML = `<div class="info-card"><h3>My Payment Status</h3><p>Your membership status is currently: <strong>${state.user.paymentStatus}</strong></p></div>`;
 }
 
 function renderTrainerSalary() {
-    const salaryPage = document.getElementById('salary-page');
-    salaryPage.innerHTML = `<div class="info-card"><h3>Salary Status</h3><p>Your salary status is: <strong>${state.user.salaryStatus}</strong></p></div>`;
+    document.getElementById('salary-page').innerHTML = `<div class="info-card"><h3>My Salary Status</h3><p>Your current salary status is: <strong>${state.user.salaryStatus}</strong></p></div>`;
 }
 
-// --- SHARED PAGES ---
 function renderEquipment() {
-    document.getElementById('equipment-page').innerHTML = `<div class="page-header"><h2>Our Equipment</h2></div>
-    <div class="equipment-grid">
-        <div class="equipment-item"><img src="images/dumbbells.jpg" alt="Dumbbells"><h3>Dumbbell Rack</h3></div>
-        <div class="equipment-item"><img src="images/treadmills.jpg" alt="Treadmills"><h3>Treadmills</h3></div>
-        <div class="equipment-item"><img src="images/bench-press.jpg" alt="Bench Press"><h3>Bench Press</h3></div>
-        <div class="equipment-item"><img src="images/leg-press.jpg" alt="Leg Press Machine"><h3>Leg Press Machine</h3></div>
-        <div class="equipment-item"><img src="images/bikes.jpg" alt="Stationary Bikes"><h3>Stationary Bikes</h3></div>
-        <div class="equipment-item"><img src="images/cable-crossover.jpg" alt="Cable Crossover"><h3>Cable Crossover</h3></div>
-    </div>`;
+    document.getElementById('equipment-page').innerHTML = `
+        <div class="page-header"><h2>Our Equipment</h2></div>
+        <div class="equipment-grid">
+            <div class="equipment-item"><img src="images/dumbbells.jpg" alt="Dumbbells"><h3>Dumbbell Rack</h3></div>
+            <div class="equipment-item"><img src="images/treadmills.jpg" alt="Treadmills"><h3>Treadmills</h3></div>
+            <div class="equipment-item"><img src="images/bench-press.jpg" alt="Bench Press"><h3>Bench Press</h3></div>
+            <div class="equipment-item"><img src="images/leg-press.jpg" alt="Leg Press Machine"><h3>Leg Press Machine</h3></div>
+            <div class="equipment-item"><img src="images/bikes.jpg" alt="Stationary Bikes"><h3>Stationary Bikes</h3></div>
+            <div class="equipment-item"><img src="images/cable-crossover.jpg" alt="Cable Crossover"><h3>Cable Crossover</h3></div>
+        </div>`;
 }
 
 function renderPlans() {
-    document.getElementById('plans-page').innerHTML = `<div class="page-header"><h2>Membership Plans</h2></div>
-    <div class="plans-grid">
-        <div class="plan-card"><h3>Basic</h3><div class="plan-price">₹10,000 <small>/ year</small></div><ul class="plan-features"><li><i class="fas fa-check"></i> Full Gym Access</li><li><i class="fas fa-times"></i> Group Classes</li></ul></div>
-        <div class="plan-card"><h3>Premium</h3><div class="plan-price">₹18,000 <small>/ year</small></div><ul class="plan-features"><li><i class="fas fa-check"></i> Full Gym Access</li><li><i class="fas fa-check"></i> Unlimited Group Classes</li></ul></div>
-        <div class="plan-card"><h3>VIP</h3><div class="plan-price">₹25,000 <small>/ year</small></div><ul class="plan-features"><li><i class="fas fa-check"></i> Full Gym Access</li><li><i class="fas fa-check"></i> Unlimited Group Classes</li><li><i class="fas fa-check"></i> Personal Trainer Sessions</li></ul></div>
-    </div>`;
+    document.getElementById('plans-page').innerHTML = `
+        <div class="page-header"><h2>Membership Plans</h2></div>
+        <div class="plans-grid">
+            <div class="plan-card"><h3>Basic</h3><div class="plan-price">₹10,000 <small>/ year</small></div><ul class="plan-features"><li><i class="fas fa-check"></i> Full Gym Access</li><li><i class="fas fa-check"></i> Locker Rooms & Showers</li><li><i class="fas fa-times"></i> Group Classes</li><li><i class="fas fa-times"></i> Personal Trainer</li></ul><button class="btn btn-primary">Choose Plan</button></div>
+            <div class="plan-card popular"><span class="popular-badge">Most Popular</span><h3>Premium</h3><div class="plan-price">₹18,000 <small>/ year</small></div><ul class="plan-features"><li><i class="fas fa-check"></i> Full Gym Access</li><li><i class="fas fa-check"></i> Locker Rooms & Showers</li><li><i class="fas fa-check"></i> Unlimited Group Classes</li><li><i class="fas fa-times"></i> Personal Trainer</li></ul><button class="btn btn-primary">Choose Plan</button></div>
+            <div class="plan-card"><h3>VIP</h3><div class="plan-price">₹25,000 <small>/ year</small></div><ul class="plan-features"><li><i class="fas fa-check"></i> Full Gym Access</li><li><i class="fas fa-check"></i> Locker Rooms & Showers</li><li><i class="fas fa-check"></i> Unlimited Group Classes</li><li><i class="fas fa-check"></i> 2 Personal Trainer Sessions/Month</li></ul><button class="btn btn-primary">Choose Plan</button></div>
+        </div>`;
 }
 
-// --- MODALS & FORM HANDLING ---
-function openMemberModal(memberId = null) {
-    const isEditing = memberId !== null;
-    const member = isEditing ? state.members.find(m => m._id === memberId) : {};
-    const modal = document.getElementById('member-modal');
-    const trainerOptions = state.trainers.map(t => `<option value="${t._id}" ${member.assignedTrainer?._id === t._id ? 'selected' : ''}>${t.name}</option>`).join('');
-    modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h3>${isEditing ? 'Edit' : 'Add'} Member</h3><span class="close" onclick="closeModal('member-modal')">&times;</span></div>
-    <form id="member-form"><div class="form-group"><label>Full Name</label><input type="text" id="member-name" value="${member.name || ''}" required></div>
-    <div class="form-group"><label>Username</label><input type="text" id="member-username" value="${member.username || ''}" ${isEditing ? 'disabled' : ''} required></div>
-    ${!isEditing ? `<div class="form-group"><label>Password</label><input type="password" id="member-password" required></div>` : ''}
-    <div class="form-group"><label>Membership Plan</label><select id="member-plan" required><option value="basic" ${member.plan === 'basic' ? 'selected' : ''}>Basic</option><option value="premium" ${member.plan === 'premium' ? 'selected' : ''}>Premium</option><option value="vip" ${member.plan === 'vip' ? 'selected' : ''}>VIP</option></select></div>
-    <div class="form-group"><label>Assign Trainer</label><select id="member-trainer"><option value="">None</option>${trainerOptions}</select></div>
-    <div class="form-group"><label>Attendance (days)</label><input type="number" id="member-attendance" value="${member.attendance || 0}" required></div>
-    <div class="form-group"><label>Payment Status</label><select id="member-payment-status" required><option value="Paid" ${member.paymentStatus === 'Paid' ? 'selected' : ''}>Paid</option><option value="Unpaid" ${member.paymentStatus === 'Unpaid' ? 'selected' : ''}>Unpaid</option></select></div>
-    <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('member-modal')">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div></form></div>`;
-    modal.style.display = 'block';
-    document.getElementById('member-form').addEventListener('submit', e => handleMemberSubmit(e, memberId));
-}
-
-async function handleMemberSubmit(e, memberId) {
-    e.preventDefault();
-    const isEditing = memberId !== null;
-    const memberData = { name: document.getElementById('member-name').value, username: document.getElementById('member-username').value, plan: document.getElementById('member-plan').value, assignedTrainer: document.getElementById('member-trainer').value || null, attendance: document.getElementById('member-attendance').value, paymentStatus: document.getElementById('member-payment-status').value };
-    if (!isEditing) memberData.password = document.getElementById('member-password').value;
-    const result = await apiRequest(isEditing ? `/members/${memberId}` : '/members', isEditing ? 'PUT' : 'POST', memberData);
-    if (result) { closeModal('member-modal'); await loadAndDisplayMembers(); } else alert('Failed to save member.');
-}
-
-async function deleteMember(memberId) {
-    if (confirm('Delete this member?')) {
-        if (await apiRequest(`/members/${memberId}`, 'DELETE')) await loadAndDisplayMembers();
-    }
-}
-
-function openTrainerModal(trainerId = null) {
-    const isEditing = trainerId !== null;
-    const trainer = isEditing ? state.trainers.find(t => t._id === trainerId) : {};
-    const modal = document.getElementById('trainer-modal');
-    modal.innerHTML = `<div class="modal-content"><div class="modal-header"><h3>${isEditing ? 'Edit' : 'Add'} Trainer</h3><span class="close" onclick="closeModal('trainer-modal')">&times;</span></div>
-    <form id="trainer-form"><div class="form-group"><label>Full Name</label><input type="text" id="trainer-name" value="${trainer.name || ''}" required></div>
-    <div class="form-group"><label>Username</label><input type="text" id="trainer-username" value="${trainer.username || ''}" ${isEditing ? 'disabled' : ''} required></div>
-    ${!isEditing ? `<div class="form-group"><label>Password</label><input type="password" id="trainer-password" required></div>` : ''}
-    <div class="form-group"><label>Specialization</label><input type="text" id="trainer-specialization" value="${trainer.specialization || ''}" required></div>
-    <div class="form-group"><label>Experience (years)</label><input type="number" id="trainer-experience" value="${trainer.experience || 0}" required></div>
-    <div class="form-group"><label>Attendance (days)</label><input type="number" id="trainer-attendance" value="${trainer.attendance || 0}" required></div>
-    <div class="form-group"><label>Salary Status</label><select id="trainer-salary-status" required><option value="Paid" ${trainer.salaryStatus === 'Paid' ? 'selected' : ''}>Paid</option><option value="Unpaid" ${trainer.salaryStatus === 'Unpaid' ? 'selected' : ''}>Unpaid</option></select></div>
-    <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeModal('trainer-modal')">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div></form></div>`;
-    modal.style.display = 'block';
-    document.getElementById('trainer-form').addEventListener('submit', e => handleTrainerSubmit(e, trainerId));
-}
-
-async function handleTrainerSubmit(e, trainerId) {
-    e.preventDefault();
-    const isEditing = trainerId !== null;
-    const trainerData = { name: document.getElementById('trainer-name').value, username: document.getElementById('trainer-username').value, specialization: document.getElementById('trainer-specialization').value, experience: document.getElementById('trainer-experience').value, attendance: document.getElementById('trainer-attendance').value, salaryStatus: document.getElementById('trainer-salary-status').value };
-    if (!isEditing) trainerData.password = document.getElementById('trainer-password').value;
-    const result = await apiRequest(isEditing ? `/trainers/${trainerId}` : '/trainers', isEditing ? 'PUT' : 'POST', trainerData);
-    if (result) { closeModal('trainer-modal'); await loadAndDisplayTrainers(); } else alert('Failed to save trainer.');
-}
-
-async function deleteTrainer(trainerId) {
-    if (confirm('Delete this trainer?')) {
-        if (await apiRequest(`/trainers/${trainerId}`, 'DELETE')) await loadAndDisplayTrainers();
-    }
-}
-
-function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-
-// --- DATA HELPERS ---
-async function loadAllData() {
-    const [members, trainers] = await Promise.all([apiRequest('/members'), apiRequest('/trainers')]);
-    state.members = members || [];
-    state.trainers = trainers || [];
-}
-
-function calculateRevenue() {
-    const plansData = { basic: 10000, premium: 18000, vip: 25000 };
-    return state.members.filter(m => m.paymentStatus === 'Paid' && plansData[m.plan]).reduce((sum, member) => sum + plansData[member.plan], 0).toLocaleString('en-IN');
-}
-
+// --- DATA HANDLING & API REQUESTS ---
 async function apiRequest(endpoint, method = 'GET', body = null) {
     try {
-        const options = { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${state.token}` } };
+        const options = {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${state.token}`
+            },
+        };
         if (body) options.body = JSON.stringify(body);
         const response = await fetch(`${API_URL}${endpoint}`, options);
-        if (!response.ok) { const err = await response.json(); throw new Error(err.message || 'API Request Failed'); }
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        }
         return method === 'DELETE' ? response.ok : response.json();
     } catch (error) {
-        console.error(`API Error: ${method} ${endpoint}`, error);
-        if (error.status === 401 || error.status === 403) logout();
+        console.error(`API request failed: ${method} ${endpoint}`, error);
+        alert(`An error occurred: ${error.message}`);
         return null;
     }
 }
 
+async function loadAllData() {
+    // Fetches both members and trainers in parallel for efficiency
+    const [members, trainers] = await Promise.all([
+        apiRequest('/members'),
+        apiRequest('/trainers')
+    ]);
+    if (members) state.members = members;
+    if (trainers) state.trainers = trainers;
+}
+
+function calculateRevenue() {
+    if (!state.members || state.members.length === 0) return 0;
+    
+    // Make the check case-insensitive and handle potential undefined plan
+    return state.members
+        .filter(member => {
+            return member.status && member.status.toLowerCase() === 'active' && 
+                   member.plan && typeof plansData[member.plan.toLowerCase()] !== 'undefined';
+        })
+        .reduce((sum, member) => {
+            return sum + plansData[member.plan.toLowerCase()].price;
+        }, 0);
+}
+
+
+// --- MODALS & FORMS ---
+function openMemberModal(id = null) {
+    currentEditId = id;
+    const modalTitle = document.getElementById('member-modal-title');
+    const form = document.getElementById('member-form');
+    form.reset();
+    
+    // Dynamically populate trainer options
+    const trainerSelect = document.getElementById('member-trainer');
+    trainerSelect.innerHTML = '<option value="">None</option>' + state.trainers.map(t => `<option value="${t._id}">${t.name}</option>`).join('');
+
+    const passwordGroup = document.getElementById('member-password-group');
+
+    if (id) {
+        modalTitle.textContent = 'Edit Member';
+        const member = state.members.find(m => m._id === id);
+        if (member) {
+            document.getElementById('member-name').value = member.name;
+            document.getElementById('member-username').value = member.username;
+            document.getElementById('member-email').value = member.email;
+            document.getElementById('member-phone').value = member.phone;
+            document.getElementById('member-plan').value = member.plan;
+            document.getElementById('member-status').value = member.status;
+            document.getElementById('member-payment').value = member.paymentStatus;
+            document.getElementById('member-attendance').value = member.attendance;
+            trainerSelect.value = member.assignedTrainer?._id || '';
+            passwordGroup.style.display = 'none'; // Hide password field when editing
+        }
+    } else {
+        modalTitle.textContent = 'Add Member';
+        passwordGroup.style.display = 'block'; // Show password field when adding
+    }
+    document.getElementById('member-modal').style.display = 'block';
+}
+
+function closeMemberModal() { document.getElementById('member-modal').style.display = 'none'; }
+
+async function handleMemberSubmit(e) {
+    e.preventDefault();
+    const memberData = {
+        name: document.getElementById('member-name').value,
+        username: document.getElementById('member-username').value,
+        email: document.getElementById('member-email').value,
+        phone: document.getElementById('member-phone').value,
+        plan: document.getElementById('member-plan').value,
+        status: document.getElementById('member-status').value,
+        paymentStatus: document.getElementById('member-payment').value,
+        attendance: document.getElementById('member-attendance').value,
+        assignedTrainer: document.getElementById('member-trainer').value || null,
+    };
+    if (!currentEditId) { // Only add password on creation
+        memberData.password = document.getElementById('member-password').value;
+    }
+
+    const endpoint = currentEditId ? `/members/${currentEditId}` : '/members';
+    const method = currentEditId ? 'PUT' : 'POST';
+    
+    const result = await apiRequest(endpoint, method, memberData);
+    if(result) {
+        closeMemberModal();
+        await showPage('members-page');
+        await renderDashboard(); // Update dashboard stats
+    }
+}
+
+async function deleteMember(id) {
+    if (confirm("Are you sure you want to delete this member? This cannot be undone.")) {
+        const result = await apiRequest(`/members/${id}`, 'DELETE');
+        if (result) {
+            await showPage('members-page');
+            await renderDashboard(); // Update dashboard stats
+        }
+    }
+}
+
+
+function openTrainerModal(id = null) {
+    currentEditId = id;
+    const modalTitle = document.getElementById('trainer-modal-title');
+    const form = document.getElementById('trainer-form');
+    form.reset();
+    
+    const passwordGroup = document.getElementById('trainer-password-group');
+
+    if (id) {
+        modalTitle.textContent = 'Edit Trainer';
+        const trainer = state.trainers.find(t => t._id === id);
+        if (trainer) {
+            document.getElementById('trainer-name').value = trainer.name;
+            document.getElementById('trainer-username').value = trainer.username;
+            document.getElementById('trainer-specialization').value = trainer.specialization;
+            document.getElementById('trainer-experience').value = trainer.experience;
+            document.getElementById('trainer-phone').value = trainer.phone;
+            document.getElementById('trainer-status').value = trainer.status;
+            document.getElementById('trainer-salary').value = trainer.salaryStatus;
+            document.getElementById('trainer-attendance').value = trainer.attendance;
+            passwordGroup.style.display = 'none';
+        }
+    } else {
+        modalTitle.textContent = 'Add Trainer';
+        passwordGroup.style.display = 'block';
+    }
+    document.getElementById('trainer-modal').style.display = 'block';
+}
+
+function closeTrainerModal() { document.getElementById('trainer-modal').style.display = 'none'; }
+
+async function handleTrainerSubmit(e) {
+    e.preventDefault();
+    const trainerData = {
+        name: document.getElementById('trainer-name').value,
+        username: document.getElementById('trainer-username').value,
+        specialization: document.getElementById('trainer-specialization').value,
+        experience: document.getElementById('trainer-experience').value,
+        phone: document.getElementById('trainer-phone').value,
+        status: document.getElementById('trainer-status').value,
+        salaryStatus: document.getElementById('trainer-salary').value,
+        attendance: document.getElementById('trainer-attendance').value,
+    };
+    if (!currentEditId) {
+        trainerData.password = document.getElementById('trainer-password').value;
+    }
+
+    const endpoint = currentEditId ? `/trainers/${currentEditId}` : '/trainers';
+    const method = currentEditId ? 'PUT' : 'POST';
+
+    const result = await apiRequest(endpoint, method, trainerData);
+    if(result) {
+        closeTrainerModal();
+        await showPage('trainers-page');
+        await renderDashboard();
+    }
+}
+
+async function deleteTrainer(id) {
+    if (confirm("Are you sure you want to delete this trainer? This cannot be undone.")) {
+        const result = await apiRequest(`/trainers/${id}`, 'DELETE');
+        if (result) {
+            await showPage('trainers-page');
+            await renderDashboard();
+        }
+    }
+}
 
