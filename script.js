@@ -79,14 +79,13 @@ async function handleLogin(e) {
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || 'Login failed');
 
-        state.token = data.token;
-        state.user = data.user;
-        state.role = data.role;
-        localStorage.setItem('token', state.token);
-        localStorage.setItem('user', JSON.stringify(state.user));
-        localStorage.setItem('role', state.role);
+        // Store session info in localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('role', data.role);
         
-        await initializeApp();
+        // **MODIFIED:** Force a page reload to ensure the app initializes correctly
+        location.reload();
 
     } catch (error) {
         document.getElementById('login-error').textContent = error.message;
