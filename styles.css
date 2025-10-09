@@ -164,8 +164,31 @@ body {
 .status-unpaid, .status-inactive { background: #7a464c; color: #f8d7da; }
 
 /* Modals */
-.modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); animation: fadeIn 0.3s ease; }
-.modal-content { background-color: #2d2f34; margin: 5% auto; padding: 0; border-radius: 10px; width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+/* **MODIFIED:** Added overflow-y and padding to make the modal scrollable */
+.modal { 
+    display: none; 
+    position: fixed; 
+    z-index: 2000; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0, 0, 0, 0.7); 
+    animation: fadeIn 0.3s ease;
+    overflow-y: auto; /* Allows the modal to scroll if content is too tall */
+    padding: 50px 0; /* Adds space at the top and bottom when scrolling */
+}
+
+.modal-content { 
+    background-color: #2d2f34; 
+    margin: 0 auto; /* Changed from 5% auto to just auto for better scroll behavior */
+    padding: 0; 
+    border-radius: 10px; 
+    width: 90%; 
+    max-width: 500px; 
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
+}
+
 .modal-header { padding: 20px 25px; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center; }
 .close { font-size: 1.5rem; cursor: pointer; }
 form { padding: 25px; }
@@ -194,4 +217,3 @@ form { padding: 25px; }
     .main-content { margin-left: 0; }
     .menu-toggle { display: block; }
 }
-
