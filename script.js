@@ -114,11 +114,6 @@ async function initializeApp() {
     setupAppEventListeners();
 }
 
-/**
- * MODIFIED FUNCTION
- * This function now builds the navigation links in the sidebar
- * based on the user's role, as per your requirements.
- */
 function renderNav() {
     // Start with the Dashboard link, common to all roles.
     let links = navLinkTemplate('dashboard-page', 'fas fa-chart-bar', 'Dashboard');
