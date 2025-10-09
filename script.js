@@ -1,4 +1,4 @@
-const API_URL = 'https://fitzone-ekkm.onrender.com/api'; // This will be your deployed backend URL
+const API_URL = 'https://fitzone-backend-2elo.onrender.com/api'; // This will be your deployed backend URL
 let currentEditId = null;
 
 // --- STATE MANAGEMENT ---
@@ -389,4 +389,5 @@ async function apiRequest(endpoint, method = 'GET', body = null) {
         return null;
     }
 }
+
 
