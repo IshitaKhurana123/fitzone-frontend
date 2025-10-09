@@ -10,38 +10,41 @@
 
 <body>
     <!-- Login Page -->
-    <div id="login-page">
-        <div class="login-container">
+    <div id="login-page" class="login-container">
+        <div class="login-box">
             <h1 class="login-title">FITZONE</h1>
-            <p class="login-subtitle">Select your role to login</p>
+            
             <div id="role-selection">
-                <button class="role-btn" data-role="admin">Admin</button>
-                <button class="role-btn" data-role="trainer">Trainer</button>
-                <button class="role-btn" data-role="member">Member</button>
+                <h2 class="login-subtitle">Choose your login</h2>
+                <button class="role-btn" data-role="admin">Admin Login</button>
+                <button class="role-btn" data-role="trainer">Trainer Login</button>
+                <button class="role-btn" data-role="member">Member Login</button>
             </div>
+
             <form id="login-form" class="hidden">
-                <h3 id="login-form-title">Login</h3>
+                <h2 id="login-form-title" class="login-subtitle">Login</h2>
                 <div class="form-group">
                     <input type="text" id="username" placeholder="Username" required>
                 </div>
                 <div class="form-group">
                     <input type="password" id="password" placeholder="Password" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Login</button>
-                <button type="button" id="back-to-roles" class="btn btn-secondary">Back</button>
+                <button type="submit" class="btn btn-primary login-submit-btn">Login</button>
+                <button type="button" id="back-to-roles" class="back-btn">Back</button>
                 <p id="login-error" class="error-message"></p>
             </form>
         </div>
     </div>
 
-    <!-- Main App -->
-    <div id="app-container" class="container" style="display: none;">
+    <!-- Main App Container (Initially Hidden) -->
+    <div id="app-container" class="container">
         <nav class="sidebar">
             <div class="sidebar-header">
                 <h2><i class="fas fa-dumbbell"></i> FitZone</h2>
             </div>
+            <!-- This is the corrected line -->
             <ul id="nav-links" class="nav-links">
-                <!-- Links will be dynamically inserted here by JS -->
+                <!-- Links will be dynamically inserted here by script.js -->
             </ul>
         </nav>
 
@@ -53,28 +56,64 @@
                 </div>
                 <div class="header-right">
                     <div class="user-info">
-                        <span id="welcome-message">Welcome, User</span>
+                        <span id="welcome-message">Welcome</span>
                         <i class="fas fa-user-circle"></i>
                     </div>
                     <button id="logout-btn" class="btn btn-danger">Logout</button>
                 </div>
             </header>
 
-            <!-- Pages will be dynamically populated here by JS -->
-            <div id="dashboard-page" class="page"></div>
+            <!-- Page Content Containers -->
+            <div id="dashboard-page" class="page active"></div>
             <div id="members-page" class="page"></div>
             <div id="trainers-page" class="page"></div>
             <div id="payment-page" class="page"></div>
             <div id="salary-page" class="page"></div>
             <div id="equipment-page" class="page"></div>
             <div id="plans-page" class="page"></div>
-
         </main>
     </div>
 
-    <!-- Modals (For Admin Forms) -->
-    <div id="member-modal" class="modal"></div>
-    <div id="trainer-modal" class="modal"></div>
+    <!-- Modals for Admin -->
+    <div id="member-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="member-modal-title">Add Member</h3><span class="close" onclick="closeMemberModal()">&times;</span>
+            </div>
+            <form id="member-form" onsubmit="handleMemberSubmit(event)">
+                <div class="form-group"><label for="member-name">Full Name</label><input type="text" id="member-name" required></div>
+                <div class="form-group"><label for="member-username">Username</label><input type="text" id="member-username" required></div>
+                <div class="form-group" id="member-password-group"><label for="member-password">Password</label><input type="password" id="member-password" required></div>
+                <div class="form-group"><label for="member-email">Email</label><input type="email" id="member-email" required></div>
+                <div class="form-group"><label for="member-phone">Phone</label><input type="tel" id="member-phone" required></div>
+                <div class="form-group"><label for="member-plan">Membership Plan</label><select id="member-plan" required><option value="basic">Basic</option><option value="premium">Premium</option><option value="vip">VIP</option></select></div>
+                <div class="form-group"><label for="member-trainer">Assign Trainer</label><select id="member-trainer"></select></div>
+                <div class="form-group"><label for="member-status">Status</label><select id="member-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+                <div class="form-group"><label for="member-payment">Payment Status</label><select id="member-payment"><option value="Paid">Paid</option><option value="Unpaid">Unpaid</option></select></div>
+                <div class="form-group"><label for="member-attendance">Attendance (Days)</label><input type="number" id="member-attendance" value="0" required></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeMemberModal()">Cancel</button><button type="submit" class="btn btn-primary">Save Member</button></div>
+            </form>
+        </div>
+    </div>
+    <div id="trainer-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="trainer-modal-title">Add Trainer</h3><span class="close" onclick="closeTrainerModal()">&times;</span>
+            </div>
+            <form id="trainer-form" onsubmit="handleTrainerSubmit(event)">
+                <div class="form-group"><label for="trainer-name">Full Name</label><input type="text" id="trainer-name" required></div>
+                <div class="form-group"><label for="trainer-username">Username</label><input type="text" id="trainer-username" required></div>
+                <div class="form-group" id="trainer-password-group"><label for="trainer-password">Password</label><input type="password" id="trainer-password" required></div>
+                <div class="form-group"><label for="trainer-specialization">Specialization</label><input type="text" id="trainer-specialization" required></div>
+                <div class="form-group"><label for="trainer-experience">Experience (years)</label><input type="number" id="trainer-experience" required></div>
+                <div class="form-group"><label for="trainer-phone">Phone</label><input type="tel" id="trainer-phone" required></div>
+                <div class="form-group"><label for="trainer-status">Status</label><select id="trainer-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+                <div class="form-group"><label for="trainer-salary">Salary Status</label><select id="trainer-salary"><option value="Paid">Paid</option><option value="Unpaid">Unpaid</option></select></div>
+                <div class="form-group"><label for="trainer-attendance">Attendance (Days)</label><input type="number" id="trainer-attendance" value="0" required></div>
+                <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeTrainerModal()">Cancel</button><button type="submit" class="btn btn-primary">Save Trainer</button></div>
+            </form>
+        </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="script.js"></script>
