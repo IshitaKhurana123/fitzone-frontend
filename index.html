@@ -29,7 +29,6 @@
                     <input type="password" id="password" placeholder="Password" required>
                 </div>
                 <button type="submit" class="btn btn-primary login-submit-btn">Login</button>
-                <button type="button" id="back-to-roles" class="back-btn">Back</button>
                 <p id="login-error" class="error-message"></p>
             </form>
         </div>
@@ -82,7 +81,6 @@
                 <div class="form-group"><label for="member-phone">Phone</label><input type="tel" id="member-phone" required></div>
                 <div class="form-group"><label for="member-plan">Membership Plan</label><select id="member-plan" required><option value="basic">Basic</option><option value="premium">Premium</option><option value="vip">VIP</option></select></div>
                 <div class="form-group"><label for="member-trainer">Assign Trainer</label><select id="member-trainer"></select></div>
-                <div class="form-group"><label for="member-status">Status</label><select id="member-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
                 <div class="form-group"><label for="member-payment">Payment Status</label><select id="member-payment"><option value="Paid">Paid</option><option value="Unpaid">Unpaid</option></select></div>
                 <div class="form-group"><label for="member-attendance">Attendance (Days)</label><input type="number" id="member-attendance" value="0" required></div>
                 <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeMemberModal()">Cancel</button><button type="submit" class="btn btn-primary">Save Member</button></div>
@@ -101,11 +99,21 @@
                 <div class="form-group"><label for="trainer-specialization">Specialization</label><input type="text" id="trainer-specialization" required></div>
                 <div class="form-group"><label for="trainer-experience">Experience (years)</label><input type="number" id="trainer-experience" required></div>
                 <div class="form-group"><label for="trainer-phone">Phone</label><input type="tel" id="trainer-phone" required></div>
-                <div class="form-group"><label for="trainer-status">Status</label><select id="trainer-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
-                <div class="form-group"><label for="trainer-salary">Salary Status</label><select id="trainer-salary"><option value="Paid">Paid</option><option value="Unpaid">Unpaid</option></select></div>
                 <div class="form-group"><label for="trainer-attendance">Attendance (Days)</label><input type="number" id="trainer-attendance" value="0" required></div>
                 <div class="form-actions"><button type="button" class="btn btn-secondary" onclick="closeTrainerModal()">Cancel</button><button type="submit" class="btn btn-primary">Save Trainer</button></div>
             </form>
+        </div>
+    </div>
+
+    <div id="qr-modal" class="modal">
+        <div class="modal-content qr-modal-content">
+             <div class="modal-header">
+                <h3 id="qr-modal-title">Scan to Pay</h3><span class="close" onclick="closePaymentQR()">&times;</span>
+            </div>
+            <div class="qr-code-container">
+                <img id="qr-code-image" src="" alt="QR Code">
+                <p>Scan the code with any UPI app to pay <strong id="qr-amount"></strong> for the <strong id="qr-plan-name"></strong> plan.</p>
+            </div>
         </div>
     </div>
 
