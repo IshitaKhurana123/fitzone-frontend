@@ -23,8 +23,6 @@ const loginPage = document.getElementById('login-page');
 const appContainer = document.getElementById('app-container');
 const roleSelection = document.getElementById('role-selection');
 const loginForm = document.getElementById('login-form');
-// REMOVED: Back to roles button is no longer in HTML
-// const backToRolesBtn = document.getElementById('back-to-roles');
 const logoutBtn = document.getElementById('logout-btn');
 const navLinks = document.getElementById('nav-links');
 const pageTitle = document.getElementById('page-title');
@@ -46,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupGlobalEventListeners() {
     roleSelection.addEventListener('click', handleRoleSelect);
     loginForm.addEventListener('submit', handleLogin);
-    // REMOVED: Back button event listener
     logoutBtn.addEventListener('click', logout);
 }
 
@@ -106,7 +103,6 @@ async function initializeApp() {
     gsap.from(".sidebar", { duration: 1, x: -250, ease: "power2.out" });
     gsap.from(".header", { duration: 1, y: -100, opacity: 0, ease: "power2.out", delay: 0.5 });
     
-    // MODIFIED: Welcome message logic changed for admin
     if (state.role === 'admin') {
         welcomeMessage.textContent = 'Welcome, Admin';
     } else {
@@ -134,7 +130,6 @@ function renderNav() {
             links += navLinkTemplate('plans-page', 'fas fa-tasks', 'Plans');
             break;
         case 'trainer':
-            // REMOVED: Salary link is no longer added for trainers
             links += navLinkTemplate('equipment-page', 'fas fa-tools', 'Equipment');
             links += navLinkTemplate('plans-page', 'fas fa-tasks', 'Plans');
             break;
@@ -172,8 +167,6 @@ async function showPage(pageId) {
         case 'members-page': await renderAdminMembers(); break;
         case 'trainers-page': await renderAdminTrainers(); break;
         case 'payment-page': renderMemberPayment(); break;
-        // REMOVED: Salary page render call is no longer needed
-        // case 'salary-page': renderTrainerSalary(); break; 
         case 'equipment-page': renderEquipment(); break;
         case 'plans-page': renderPlans(); break;
     }
@@ -195,7 +188,6 @@ async function renderDashboard() {
     switch(state.role) {
         case 'admin':
             await loadAllData();
-            // MODIFIED: Removed 'activeMembers' and 'activeTrainers' as the status field is gone.
             content = `
                 <div class="stats-grid">
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-info"><h3>${state.members.length}</h3><p>Total Members</p></div></div>
@@ -234,7 +226,6 @@ async function renderDashboard() {
 // --- ADMIN PAGES ---
 async function renderAdminMembers() {
     const membersPage = document.getElementById('members-page');
-    // MODIFIED: Removed 'Status' column from the table header
     membersPage.innerHTML = `
         <div class="page-header"><h2>Member Management</h2><button id="add-member-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Add Member</button></div>
         <div class="table-container"><table class="data-table"><thead><tr><th>Name</th><th>Plan</th><th>Trainer</th><th>Attendance</th><th>Payment</th><th>Actions</th></tr></thead><tbody id="members-table-body"></tbody></table></div>`;
@@ -246,7 +237,6 @@ async function loadAndDisplayMembers() {
     await loadAllData();
     const tableBody = document.getElementById('members-table-body');
     if (!tableBody) return;
-    // MODIFIED: Removed status cell from the table row
     tableBody.innerHTML = state.members.length > 0 ? state.members.map(member => `
         <tr>
             <td>${member.name}</td><td>${member.plan}</td><td>${member.assignedTrainer ? member.assignedTrainer.name : 'N/A'}</td><td>${member.attendance} days</td>
@@ -257,7 +247,6 @@ async function loadAndDisplayMembers() {
 
 async function renderAdminTrainers() {
     const trainersPage = document.getElementById('trainers-page');
-    // MODIFIED: Removed 'Salary' and 'Status' columns from the table header
     trainersPage.innerHTML = `
         <div class="page-header"><h2>Trainer Management</h2><button id="add-trainer-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Add Trainer</button></div>
         <div class="table-container"><table class="data-table"><thead><tr><th>Name</th><th>Specialization</th><th>Members</th><th>Attendance</th><th>Actions</th></tr></thead><tbody id="trainers-table-body"></tbody></table></div>`;
@@ -269,7 +258,6 @@ async function loadAndDisplayTrainers() {
     await loadAllData();
     const tableBody = document.getElementById('trainers-table-body');
     if (!tableBody) return;
-    // MODIFIED: Removed salary and status cells from the table row
     tableBody.innerHTML = state.trainers.length > 0 ? state.trainers.map(trainer => `
         <tr>
             <td>${trainer.name}</td><td>${trainer.specialization}</td><td>${trainer.assignedMembers.length}</td><td>${trainer.attendance} days</td>
@@ -282,24 +270,20 @@ function renderMemberPayment() {
     document.getElementById('payment-page').innerHTML = `<div class="info-card"><h3>My Payment Status</h3><p>Your membership status is currently: <strong>${state.user.paymentStatus}</strong>.</p><p>To pay your fees, please visit the front desk.</p></div>`;
 }
 
-// REMOVED: This function is no longer called or needed
-// function renderTrainerSalary() { ... }
-
 function renderEquipment() {
     document.getElementById('equipment-page').innerHTML = `
         <div class="page-header"><h2>Our Equipment</h2></div>
         <div class="equipment-grid">
-            <div class="equipment-item"><img src="images/dumbbells.jpg" alt="Dumbbells"><h3>Dumbbell Rack</h3></div>
-            <div class="equipment-item"><img src="images/treadmills.jpg" alt="Treadmills"><h3>Treadmills</h3></div>
-            <div class="equipment-item"><img src="images/bench-press.jpg" alt="Bench Press"><h3>Bench Press</h3></div>
-            <div class="equipment-item"><img src="images/leg-press.jpg" alt="Leg Press Machine"><h3>Leg Press Machine</h3></div>
-            <div class="equipment-item"><img src="images/bikes.jpg" alt="Stationary Bikes"><h3>Stationary Bikes</h3></div>
-            <div class="equipment-item"><img src="images/cable-crossover.jpg" alt="Cable Crossover"><h3>Cable Crossover</h3></div>
+            <div class="equipment-item"><img src="/images/dumbbells.jpg" alt="Dumbbells"><h3>Dumbbell Rack</h3></div>
+            <div class="equipment-item"><img src="/images/treadmills.jpg" alt="Treadmills"><h3>Treadmills</h3></div>
+            <div class="equipment-item"><img src="/images/bench-press.jpg" alt="Bench Press"><h3>Bench Press</h3></div>
+            <div class="equipment-item"><img src="/images/leg-press.jpg" alt="Leg Press Machine"><h3>Leg Press Machine</h3></div>
+            <div class="equipment-item"><img src="/images/bikes.jpg" alt="Stationary Bikes"><h3>Stationary Bikes</h3></div>
+            <div class="equipment-item"><img src="/images/cable-crossover.jpg" alt="Cable Crossover"><h3>Cable Crossover</h3></div>
         </div>`;
 }
 
 function renderPlans() {
-    // MODIFIED: Added onclick events to the buttons to trigger the QR modal
     document.getElementById('plans-page').innerHTML = `
         <div class="page-header"><h2>Membership Plans</h2></div>
         <div class="plans-grid">
@@ -345,7 +329,6 @@ async function loadAllData() {
 function calculateRevenue() {
     if (!state.members || state.members.length === 0) return 0;
     
-    // MODIFIED: Removed the status check since it no longer exists
     return state.members
         .filter(member => {
             return member.plan && typeof plansData[member.plan.toLowerCase()] !== 'undefined';
@@ -357,7 +340,6 @@ function calculateRevenue() {
 
 
 // --- MODALS & FORMS ---
-// NEW: Functions to control the QR code payment modal
 function showPaymentQR(planName, price) {
     const formattedPrice = `₹${price.toLocaleString('en-IN')}`;
     const upiLink = `upi://pay?pa=your-upi-id@okhdfcbank&pn=FitZone&am=${price}.00&cu=INR&tn=Payment for ${planName} Plan`;
@@ -395,7 +377,6 @@ function openMemberModal(id = null) {
             document.getElementById('member-email').value = member.email;
             document.getElementById('member-phone').value = member.phone;
             document.getElementById('member-plan').value = member.plan;
-            // REMOVED: Status field population
             document.getElementById('member-payment').value = member.paymentStatus;
             document.getElementById('member-attendance').value = member.attendance;
             trainerSelect.value = member.assignedTrainer?._id || '';
@@ -412,7 +393,6 @@ function closeMemberModal() { document.getElementById('member-modal').style.disp
 
 async function handleMemberSubmit(e) {
     e.preventDefault();
-    // MODIFIED: Removed 'status' from the member data object
     const memberData = {
         name: document.getElementById('member-name').value,
         username: document.getElementById('member-username').value,
@@ -465,7 +445,6 @@ function openTrainerModal(id = null) {
             document.getElementById('trainer-specialization').value = trainer.specialization;
             document.getElementById('trainer-experience').value = trainer.experience;
             document.getElementById('trainer-phone').value = trainer.phone;
-            // REMOVED: Status and Salary field population
             document.getElementById('trainer-attendance').value = trainer.attendance;
             passwordGroup.style.display = 'none';
         }
@@ -480,7 +459,6 @@ function closeTrainerModal() { document.getElementById('trainer-modal').style.di
 
 async function handleTrainerSubmit(e) {
     e.preventDefault();
-    // MODIFIED: Removed 'status' and 'salaryStatus' from the trainer data object
     const trainerData = {
         name: document.getElementById('trainer-name').value,
         username: document.getElementById('trainer-username').value,
