@@ -103,7 +103,7 @@ async function initializeApp() {
     gsap.from(".sidebar", { duration: 1, x: -250, ease: "power2.out" });
     gsap.from(".header", { duration: 1, y: -100, opacity: 0, ease: "power2.out", delay: 0.5 });
     
-    // CHANGE 1: Welcome message updated to "Admin/Manager"
+    // **CHANGE 1 IMPLEMENTED HERE**
     if (state.role === 'admin') {
         welcomeMessage.textContent = 'Welcome, Admin/Manager';
     } else {
@@ -189,7 +189,7 @@ async function renderDashboard() {
     switch(state.role) {
         case 'admin':
             await loadAllData();
-            // CHANGE 2: Yearly Revenue card has been removed from the grid
+            // **CHANGE 2 IMPLEMENTED HERE**
             content = `
                 <div class="stats-grid">
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-info"><h3>${state.members.length}</h3><p>Total Members</p></div></div>
@@ -326,8 +326,6 @@ async function loadAllData() {
     if (members) state.members = members;
     if (trainers) state.trainers = trainers;
 }
-
-// REMOVED: calculateRevenue function is no longer needed
 
 // --- MODALS & FORMS ---
 function showPaymentQR(planName, price) {
