@@ -23,7 +23,8 @@ const loginPage = document.getElementById('login-page');
 const appContainer = document.getElementById('app-container');
 const roleSelection = document.getElementById('role-selection');
 const loginForm = document.getElementById('login-form');
-const backToRolesBtn = document.getElementById('back-to-roles');
+// REMOVED: Back to roles button is no longer in HTML
+// const backToRolesBtn = document.getElementById('back-to-roles');
 const logoutBtn = document.getElementById('logout-btn');
 const navLinks = document.getElementById('nav-links');
 const pageTitle = document.getElementById('page-title');
@@ -45,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupGlobalEventListeners() {
     roleSelection.addEventListener('click', handleRoleSelect);
     loginForm.addEventListener('submit', handleLogin);
-    backToRolesBtn.addEventListener('click', showRoleSelection);
+    // REMOVED: Back button event listener
     logoutBtn.addEventListener('click', logout);
 }
 
@@ -79,12 +80,10 @@ async function handleLogin(e) {
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || 'Login failed');
 
-        // Store session info in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('role', data.role);
         
-        // **MODIFIED:** Force a page reload to ensure the app initializes correctly
         location.reload();
 
     } catch (error) {
@@ -95,7 +94,7 @@ async function handleLogin(e) {
 function logout() {
     state = { token: null, user: null, role: null, members: [], trainers: [] };
     localStorage.clear();
-    location.reload(); // Easiest way to reset the app state
+    location.reload();
 }
 
 // --- APP & UI LOGIC ---
@@ -107,33 +106,35 @@ async function initializeApp() {
     gsap.from(".sidebar", { duration: 1, x: -250, ease: "power2.out" });
     gsap.from(".header", { duration: 1, y: -100, opacity: 0, ease: "power2.out", delay: 0.5 });
     
-    welcomeMessage.textContent = `Welcome, ${state.user.name || state.user.username}`;
+    // MODIFIED: Welcome message logic changed for admin
+    if (state.role === 'admin') {
+        welcomeMessage.textContent = 'Welcome, Admin';
+    } else {
+        welcomeMessage.textContent = `Welcome, ${state.user.name || state.user.username}`;
+    }
+
     renderNav();
     await showPage('dashboard-page');
     setupAppEventListeners();
 }
 
 function renderNav() {
-    // Start with the Dashboard link, common to all roles.
     let links = navLinkTemplate('dashboard-page', 'fas fa-chart-bar', 'Dashboard');
     
     switch (state.role) {
         case 'admin':
-            // Admin: Member & Trainer Management, Equipment, and Plans
             links += navLinkTemplate('members-page', 'fas fa-users', 'Members');
             links += navLinkTemplate('trainers-page', 'fas fa-user-tie', 'Trainers');
             links += navLinkTemplate('equipment-page', 'fas fa-tools', 'Equipment');
             links += navLinkTemplate('plans-page', 'fas fa-tasks', 'Plans');
             break;
         case 'member':
-            // Member: Payment, Equipment, and Plans
             links += navLinkTemplate('payment-page', 'fas fa-credit-card', 'Payment');
             links += navLinkTemplate('equipment-page', 'fas fa-tools', 'Equipment');
             links += navLinkTemplate('plans-page', 'fas fa-tasks', 'Plans');
             break;
         case 'trainer':
-            // Trainer: Salary, Equipment, and Plans
-            links += navLinkTemplate('salary-page', 'fas fa-money-bill-wave', 'Salary');
+            // REMOVED: Salary link is no longer added for trainers
             links += navLinkTemplate('equipment-page', 'fas fa-tools', 'Equipment');
             links += navLinkTemplate('plans-page', 'fas fa-tasks', 'Plans');
             break;
@@ -166,13 +167,13 @@ async function showPage(pageId) {
         pageTitle.textContent = activeLink.textContent.trim();
     }
 
-    // Load content for the requested page
     switch(pageId) {
         case 'dashboard-page': await renderDashboard(); break;
         case 'members-page': await renderAdminMembers(); break;
         case 'trainers-page': await renderAdminTrainers(); break;
         case 'payment-page': renderMemberPayment(); break;
-        case 'salary-page': renderTrainerSalary(); break;
+        // REMOVED: Salary page render call is no longer needed
+        // case 'salary-page': renderTrainerSalary(); break; 
         case 'equipment-page': renderEquipment(); break;
         case 'plans-page': renderPlans(); break;
     }
@@ -194,14 +195,11 @@ async function renderDashboard() {
     switch(state.role) {
         case 'admin':
             await loadAllData();
-            const activeMembers = state.members.filter(m => m.status === 'active').length;
-            const activeTrainers = state.trainers.filter(t => t.status === 'active').length;
+            // MODIFIED: Removed 'activeMembers' and 'activeTrainers' as the status field is gone.
             content = `
                 <div class="stats-grid">
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-info"><h3>${state.members.length}</h3><p>Total Members</p></div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-check"></i></div><div class="stat-info"><h3>${activeMembers}</h3><p>Active Members</p></div></div>
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-tie"></i></div><div class="stat-info"><h3>${state.trainers.length}</h3><p>Total Trainers</p></div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-clock"></i></div><div class="stat-info"><h3>${activeTrainers}</h3><p>Active Trainers</p></div></div>
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-rupee-sign"></i></div><div class="stat-info"><h3>₹${calculateRevenue().toLocaleString('en-IN')}</h3><p>Yearly Revenue</p></div></div>
                 </div>`;
             break;
@@ -224,7 +222,6 @@ async function renderDashboard() {
             content = `
                 <div class="dashboard-grid">
                     <div class="info-card"><h3>My Attendance</h3><p class="stat-info-h3">${state.user.attendance} Days</p></div>
-                    <div class="info-card"><h3>Salary Status</h3><p>Your salary is currently <strong>${state.user.salaryStatus}</strong>.</p></div>
                 </div>
                 <div class="page-header" style="margin-top: 30px;"><h2>Assigned Members</h2></div>
                 ${assignedMembersList}`;
@@ -237,9 +234,10 @@ async function renderDashboard() {
 // --- ADMIN PAGES ---
 async function renderAdminMembers() {
     const membersPage = document.getElementById('members-page');
+    // MODIFIED: Removed 'Status' column from the table header
     membersPage.innerHTML = `
         <div class="page-header"><h2>Member Management</h2><button id="add-member-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Add Member</button></div>
-        <div class="table-container"><table class="data-table"><thead><tr><th>Name</th><th>Plan</th><th>Trainer</th><th>Attendance</th><th>Payment</th><th>Status</th><th>Actions</th></tr></thead><tbody id="members-table-body"></tbody></table></div>`;
+        <div class="table-container"><table class="data-table"><thead><tr><th>Name</th><th>Plan</th><th>Trainer</th><th>Attendance</th><th>Payment</th><th>Actions</th></tr></thead><tbody id="members-table-body"></tbody></table></div>`;
     document.getElementById('add-member-btn').addEventListener('click', () => openMemberModal());
     await loadAndDisplayMembers();
 }
@@ -248,19 +246,21 @@ async function loadAndDisplayMembers() {
     await loadAllData();
     const tableBody = document.getElementById('members-table-body');
     if (!tableBody) return;
+    // MODIFIED: Removed status cell from the table row
     tableBody.innerHTML = state.members.length > 0 ? state.members.map(member => `
         <tr>
             <td>${member.name}</td><td>${member.plan}</td><td>${member.assignedTrainer ? member.assignedTrainer.name : 'N/A'}</td><td>${member.attendance} days</td>
-            <td><span class="status status-${member.paymentStatus.toLowerCase()}">${member.paymentStatus}</span></td><td><span class="status status-${member.status.toLowerCase()}">${member.status}</span></td>
+            <td><span class="status status-${member.paymentStatus.toLowerCase()}">${member.paymentStatus}</span></td>
             <td><button class="btn btn-warning btn-sm" onclick="openMemberModal('${member._id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteMember('${member._id}')">Delete</button></td>
-        </tr>`).join('') : `<tr><td colspan="7">No members found.</td></tr>`;
+        </tr>`).join('') : `<tr><td colspan="6">No members found.</td></tr>`;
 }
 
 async function renderAdminTrainers() {
     const trainersPage = document.getElementById('trainers-page');
+    // MODIFIED: Removed 'Salary' and 'Status' columns from the table header
     trainersPage.innerHTML = `
         <div class="page-header"><h2>Trainer Management</h2><button id="add-trainer-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Add Trainer</button></div>
-        <div class="table-container"><table class="data-table"><thead><tr><th>Name</th><th>Specialization</th><th>Members</th><th>Attendance</th><th>Salary</th><th>Status</th><th>Actions</th></tr></thead><tbody id="trainers-table-body"></tbody></table></div>`;
+        <div class="table-container"><table class="data-table"><thead><tr><th>Name</th><th>Specialization</th><th>Members</th><th>Attendance</th><th>Actions</th></tr></thead><tbody id="trainers-table-body"></tbody></table></div>`;
     document.getElementById('add-trainer-btn').addEventListener('click', () => openTrainerModal());
     await loadAndDisplayTrainers();
 }
@@ -269,23 +269,21 @@ async function loadAndDisplayTrainers() {
     await loadAllData();
     const tableBody = document.getElementById('trainers-table-body');
     if (!tableBody) return;
+    // MODIFIED: Removed salary and status cells from the table row
     tableBody.innerHTML = state.trainers.length > 0 ? state.trainers.map(trainer => `
         <tr>
             <td>${trainer.name}</td><td>${trainer.specialization}</td><td>${trainer.assignedMembers.length}</td><td>${trainer.attendance} days</td>
-            <td><span class="status status-${trainer.salaryStatus.toLowerCase()}">${trainer.salaryStatus}</span></td><td><span class="status status-${trainer.status.toLowerCase()}">${trainer.status}</span></td>
             <td><button class="btn btn-warning btn-sm" onclick="openTrainerModal('${trainer._id}')">Edit</button><button class="btn btn-danger btn-sm" onclick="deleteTrainer('${trainer._id}')">Delete</button></td>
-        </tr>`).join('') : `<tr><td colspan="7">No trainers found.</td></tr>`;
+        </tr>`).join('') : `<tr><td colspan="5">No trainers found.</td></tr>`;
 }
-
 
 // --- MEMBER/TRAINER-SPECIFIC PAGES ---
 function renderMemberPayment() {
     document.getElementById('payment-page').innerHTML = `<div class="info-card"><h3>My Payment Status</h3><p>Your membership status is currently: <strong>${state.user.paymentStatus}</strong>.</p><p>To pay your fees, please visit the front desk.</p></div>`;
 }
 
-function renderTrainerSalary() {
-    document.getElementById('salary-page').innerHTML = `<div class="info-card"><h3>My Salary Status</h3><p>Your current salary status is: <strong>${state.user.salaryStatus}</strong>.</p><p>For a detailed salary history, please contact the administration.</p></div>`;
-}
+// REMOVED: This function is no longer called or needed
+// function renderTrainerSalary() { ... }
 
 function renderEquipment() {
     document.getElementById('equipment-page').innerHTML = `
@@ -301,12 +299,13 @@ function renderEquipment() {
 }
 
 function renderPlans() {
+    // MODIFIED: Added onclick events to the buttons to trigger the QR modal
     document.getElementById('plans-page').innerHTML = `
         <div class="page-header"><h2>Membership Plans</h2></div>
         <div class="plans-grid">
-            <div class="plan-card"><h3>Basic</h3><div class="plan-price">₹10,000 <small>/ year</small></div><ul class="plan-features"><li><i class="fas fa-check"></i> Full Gym Access</li><li><i class="fas fa-check"></i> Locker Rooms & Showers</li><li><i class="fas fa-times"></i> Group Classes</li><li><i class="fas fa-times"></i> Personal Trainer</li></ul><button class="btn btn-primary">Choose Plan</button></div>
-            <div class="plan-card popular"><span class="popular-badge">Most Popular</span><h3>Premium</h3><div class="plan-price">₹18,000 <small>/ year</small></div><ul class="plan-features"><li><i class="fas fa-check"></i> Full Gym Access</li><li><i class="fas fa-check"></i> Locker Rooms & Showers</li><li><i class="fas fa-check"></i> Unlimited Group Classes</li><li><i class="fas fa-times"></i> Personal Trainer</li></ul><button class="btn btn-primary">Choose Plan</button></div>
-            <div class="plan-card"><h3>VIP</h3><div class="plan-price">₹25,000 <small>/ year</small></div><ul class="plan-features"><li><i class="fas fa-check"></i> Full Gym Access</li><li><i class="fas fa-check"></i> Locker Rooms & Showers</li><li><i class="fas fa-check"></i> Unlimited Group Classes</li><li><i class="fas fa-check"></i> 2 Personal Trainer Sessions/Month</li></ul><button class="btn btn-primary">Choose Plan</button></div>
+            <div class="plan-card"><h3>Basic</h3><div class="plan-price">₹10,000 <small>/ year</small></div><ul class="plan-features"><li><i class="fas fa-check"></i> Full Gym Access</li><li><i class="fas fa-check"></i> Locker Rooms & Showers</li><li><i class="fas fa-times"></i> Group Classes</li><li><i class="fas fa-times"></i> Personal Trainer</li></ul><button class="btn btn-primary" onclick="showPaymentQR('Basic', 10000)">Choose Plan</button></div>
+            <div class="plan-card popular"><span class="popular-badge">Most Popular</span><h3>Premium</h3><div class="plan-price">₹18,000 <small>/ year</small></div><ul class="plan-features"><li><i class="fas fa-check"></i> Full Gym Access</li><li><i class="fas fa-check"></i> Locker Rooms & Showers</li><li><i class="fas fa-check"></i> Unlimited Group Classes</li><li><i class="fas fa-times"></i> Personal Trainer</li></ul><button class="btn btn-primary" onclick="showPaymentQR('Premium', 18000)">Choose Plan</button></div>
+            <div class="plan-card"><h3>VIP</h3><div class="plan-price">₹25,000 <small>/ year</small></div><ul class="plan-features"><li><i class="fas fa-check"></i> Full Gym Access</li><li><i class="fas fa-check"></i> Locker Rooms & Showers</li><li><i class="fas fa-check"></i> Unlimited Group Classes</li><li><i class="fas fa-check"></i> 2 Personal Trainer Sessions/Month</li></ul><button class="btn btn-primary" onclick="showPaymentQR('VIP', 25000)">Choose Plan</button></div>
         </div>`;
 }
 
@@ -335,7 +334,6 @@ async function apiRequest(endpoint, method = 'GET', body = null) {
 }
 
 async function loadAllData() {
-    // Fetches both members and trainers in parallel for efficiency
     const [members, trainers] = await Promise.all([
         apiRequest('/members'),
         apiRequest('/trainers')
@@ -347,11 +345,10 @@ async function loadAllData() {
 function calculateRevenue() {
     if (!state.members || state.members.length === 0) return 0;
     
-    // Make the check case-insensitive and handle potential undefined plan
+    // MODIFIED: Removed the status check since it no longer exists
     return state.members
         .filter(member => {
-            return member.status && member.status.toLowerCase() === 'active' && 
-                   member.plan && typeof plansData[member.plan.toLowerCase()] !== 'undefined';
+            return member.plan && typeof plansData[member.plan.toLowerCase()] !== 'undefined';
         })
         .reduce((sum, member) => {
             return sum + plansData[member.plan.toLowerCase()].price;
@@ -360,13 +357,30 @@ function calculateRevenue() {
 
 
 // --- MODALS & FORMS ---
+// NEW: Functions to control the QR code payment modal
+function showPaymentQR(planName, price) {
+    const formattedPrice = `₹${price.toLocaleString('en-IN')}`;
+    const upiLink = `upi://pay?pa=your-upi-id@okhdfcbank&pn=FitZone&am=${price}.00&cu=INR&tn=Payment for ${planName} Plan`;
+    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}`;
+
+    document.getElementById('qr-plan-name').textContent = planName;
+    document.getElementById('qr-amount').textContent = formattedPrice;
+    document.getElementById('qr-code-image').src = qrApiUrl;
+    
+    document.getElementById('qr-modal').style.display = 'block';
+}
+
+function closePaymentQR() {
+    document.getElementById('qr-modal').style.display = 'none';
+}
+
+
 function openMemberModal(id = null) {
     currentEditId = id;
     const modalTitle = document.getElementById('member-modal-title');
     const form = document.getElementById('member-form');
     form.reset();
     
-    // Dynamically populate trainer options
     const trainerSelect = document.getElementById('member-trainer');
     trainerSelect.innerHTML = '<option value="">None</option>' + state.trainers.map(t => `<option value="${t._id}">${t.name}</option>`).join('');
 
@@ -381,15 +395,15 @@ function openMemberModal(id = null) {
             document.getElementById('member-email').value = member.email;
             document.getElementById('member-phone').value = member.phone;
             document.getElementById('member-plan').value = member.plan;
-            document.getElementById('member-status').value = member.status;
+            // REMOVED: Status field population
             document.getElementById('member-payment').value = member.paymentStatus;
             document.getElementById('member-attendance').value = member.attendance;
             trainerSelect.value = member.assignedTrainer?._id || '';
-            passwordGroup.style.display = 'none'; // Hide password field when editing
+            passwordGroup.style.display = 'none';
         }
     } else {
         modalTitle.textContent = 'Add Member';
-        passwordGroup.style.display = 'block'; // Show password field when adding
+        passwordGroup.style.display = 'block';
     }
     document.getElementById('member-modal').style.display = 'block';
 }
@@ -398,18 +412,18 @@ function closeMemberModal() { document.getElementById('member-modal').style.disp
 
 async function handleMemberSubmit(e) {
     e.preventDefault();
+    // MODIFIED: Removed 'status' from the member data object
     const memberData = {
         name: document.getElementById('member-name').value,
         username: document.getElementById('member-username').value,
         email: document.getElementById('member-email').value,
         phone: document.getElementById('member-phone').value,
         plan: document.getElementById('member-plan').value,
-        status: document.getElementById('member-status').value,
         paymentStatus: document.getElementById('member-payment').value,
         attendance: document.getElementById('member-attendance').value,
         assignedTrainer: document.getElementById('member-trainer').value || null,
     };
-    if (!currentEditId) { // Only add password on creation
+    if (!currentEditId) {
         memberData.password = document.getElementById('member-password').value;
     }
 
@@ -420,7 +434,7 @@ async function handleMemberSubmit(e) {
     if(result) {
         closeMemberModal();
         await showPage('members-page');
-        await renderDashboard(); // Update dashboard stats
+        await renderDashboard();
     }
 }
 
@@ -429,11 +443,10 @@ async function deleteMember(id) {
         const result = await apiRequest(`/members/${id}`, 'DELETE');
         if (result) {
             await showPage('members-page');
-            await renderDashboard(); // Update dashboard stats
+            await renderDashboard();
         }
     }
 }
-
 
 function openTrainerModal(id = null) {
     currentEditId = id;
@@ -452,8 +465,7 @@ function openTrainerModal(id = null) {
             document.getElementById('trainer-specialization').value = trainer.specialization;
             document.getElementById('trainer-experience').value = trainer.experience;
             document.getElementById('trainer-phone').value = trainer.phone;
-            document.getElementById('trainer-status').value = trainer.status;
-            document.getElementById('trainer-salary').value = trainer.salaryStatus;
+            // REMOVED: Status and Salary field population
             document.getElementById('trainer-attendance').value = trainer.attendance;
             passwordGroup.style.display = 'none';
         }
@@ -468,14 +480,13 @@ function closeTrainerModal() { document.getElementById('trainer-modal').style.di
 
 async function handleTrainerSubmit(e) {
     e.preventDefault();
+    // MODIFIED: Removed 'status' and 'salaryStatus' from the trainer data object
     const trainerData = {
         name: document.getElementById('trainer-name').value,
         username: document.getElementById('trainer-username').value,
         specialization: document.getElementById('trainer-specialization').value,
         experience: document.getElementById('trainer-experience').value,
         phone: document.getElementById('trainer-phone').value,
-        status: document.getElementById('trainer-status').value,
-        salaryStatus: document.getElementById('trainer-salary').value,
         attendance: document.getElementById('trainer-attendance').value,
     };
     if (!currentEditId) {
