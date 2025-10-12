@@ -2,7 +2,7 @@
 const API_URL = 'https://fitzone-backend-2elo.onrender.com/api'; 
 let currentEditId = null;
 
-// Define plan details here to calculate revenue
+// Define plan details here
 const plansData = {
     basic: { name: 'Basic', price: 10000 },
     premium: { name: 'Premium', price: 18000 },
@@ -103,8 +103,9 @@ async function initializeApp() {
     gsap.from(".sidebar", { duration: 1, x: -250, ease: "power2.out" });
     gsap.from(".header", { duration: 1, y: -100, opacity: 0, ease: "power2.out", delay: 0.5 });
     
+    // CHANGE 1: Welcome message updated to "Admin/Manager"
     if (state.role === 'admin') {
-        welcomeMessage.textContent = 'Welcome, Admin';
+        welcomeMessage.textContent = 'Welcome, Admin/Manager';
     } else {
         welcomeMessage.textContent = `Welcome, ${state.user.name || state.user.username}`;
     }
@@ -188,11 +189,11 @@ async function renderDashboard() {
     switch(state.role) {
         case 'admin':
             await loadAllData();
+            // CHANGE 2: Yearly Revenue card has been removed from the grid
             content = `
                 <div class="stats-grid">
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-info"><h3>${state.members.length}</h3><p>Total Members</p></div></div>
                     <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-tie"></i></div><div class="stat-info"><h3>${state.trainers.length}</h3><p>Total Trainers</p></div></div>
-                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-rupee-sign"></i></div><div class="stat-info"><h3>₹${calculateRevenue().toLocaleString('en-IN')}</h3><p>Yearly Revenue</p></div></div>
                 </div>`;
             break;
         case 'member':
@@ -326,18 +327,7 @@ async function loadAllData() {
     if (trainers) state.trainers = trainers;
 }
 
-function calculateRevenue() {
-    if (!state.members || state.members.length === 0) return 0;
-    
-    return state.members
-        .filter(member => {
-            return member.plan && typeof plansData[member.plan.toLowerCase()] !== 'undefined';
-        })
-        .reduce((sum, member) => {
-            return sum + plansData[member.plan.toLowerCase()].price;
-        }, 0);
-}
-
+// REMOVED: calculateRevenue function is no longer needed
 
 // --- MODALS & FORMS ---
 function showPaymentQR(planName, price) {
