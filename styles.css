@@ -1,219 +1,28 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* Add these new styles at the end of your existing styles.css file */
 
-body {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    color: #f5f5f5;
-    background-color: #0a0a0b;
-    position: relative;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-/* --- Login Page Styles --- */
-#login-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: #000 url('https://www.transparenttextures.com/patterns/stardust.png'); /* Celestial background */
+.qr-modal-content {
+    max-width: 400px;
     text-align: center;
-    animation: fadeIn 1s ease-in-out;
 }
 
-.login-container {
-    padding: 40px;
-    background: rgba(28, 30, 33, 0.8);
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+.qr-code-container {
+    padding: 30px;
 }
 
-.login-title {
-    font-size: 4rem;
-    font-weight: 700;
-    color: #667eea;
-    text-transform: uppercase;
-    letter-spacing: 5px;
-    margin-bottom: 10px;
+.qr-code-container img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
 }
 
-.login-subtitle {
-    font-size: 1.2rem;
+.qr-code-container p {
+    font-size: 1rem;
     color: #ccc;
-    margin-bottom: 30px;
+    line-height: 1.5;
 }
 
-#role-selection .role-btn {
-    background: transparent;
-    border: 2px solid #667eea;
+.qr-code-container strong {
     color: #667eea;
-    padding: 15px 30px;
-    margin: 10px;
-    border-radius: 50px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-}
-
-#role-selection .role-btn:hover {
-    background: #667eea;
-    color: white;
-}
-
-#login-form { margin-top: 20px; }
-#login-form-title { font-size: 1.5rem; margin-bottom: 20px; color: white; }
-.error-message { color: #dc3545; margin-top: 15px; height: 20px; }
-.hidden { display: none; }
-
-/* --- Main App Styles --- */
-.container { 
-    display: flex; 
-    min-height: 100vh; 
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-}
-.container.loaded { opacity: 1; }
-
-.container::before, #login-page::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -2;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    animation: imageSlideshow 30s infinite;
-}
-
-.container::after, #login-page::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background-color: rgba(10, 10, 11, 0.85);
-}
-
-@keyframes imageSlideshow {
-    0%, 100% { background-image: url('images/bench-press.jpg'); }
-    20% { background-image: url('images/treadmills.jpg'); }
-    40% { background-image: url('images/cable-crossover.jpg'); }
-    60% { background-image: url('images/leg-press.jpg'); }
-    80% { background-image: url('images/dumbbells.jpg'); }
-}
-
-.sidebar { width: 250px; background: #1c1e21; color: white; position: fixed; height: 100vh; overflow-y: auto; transition: transform 0.3s ease; z-index: 1000; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5); }
-.sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-.sidebar-header h2 { font-size: 1.5rem; font-weight: 600; }
-.nav-links { list-style: none; padding: 20px 0; }
-.nav-links li { margin-bottom: 5px; }
-.nav-link { display: flex; align-items: center; padding: 15px 20px; color: rgba(255, 255, 255, 0.7); text-decoration: none; transition: all 0.3s ease; }
-.nav-link:hover, .nav-link.active { background-color: rgba(255, 255, 255, 0.05); color: white; border-left: 3px solid #667eea; }
-.nav-link i { margin-right: 10px; width: 20px; }
-.main-content { flex: 1; margin-left: 250px; transition: margin-left 0.3s ease; }
-
-.header { background: transparent; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-.header-left { display: flex; align-items: center; }
-.menu-toggle { display: none; background: none; border: none; font-size: 1.2rem; margin-right: 15px; cursor: pointer; color: #f5f5f5; }
-.header-right { display: flex; align-items: center; gap: 15px; }
-.user-info { display: flex; align-items: center; gap: 10px; }
-.user-info i { font-size: 1.5rem; color: #667eea; }
-
-.page { display: none; padding: 30px; animation: fadeIn 0.5s ease-out; }
-.page.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-.stats-grid, .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
-.stat-card, .info-card { background: #2d2f34; padding: 25px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); transition: transform 0.3s ease, box-shadow 0.3s ease; }
-.stat-card:hover, .info-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); }
-.stat-card { display: flex; align-items: center; }
-.stat-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-size: 1.5rem; color: white; }
-.stats-grid .stat-card:nth-child(1) .stat-icon { background: #4caf50; }
-.stats-grid .stat-card:nth-child(2) .stat-icon { background: #2196f3; }
-.stats-grid .stat-card:nth-child(3) .stat-icon { background: #9c27b0; }
-.stats-grid .stat-card:nth-child(4) .stat-icon { background: #ff9800; }
-.stats-grid .stat-card:nth-child(5) .stat-icon { background: #e91e63; }
-.stat-info h3, .info-card h3 { font-size: 2rem; font-weight: 600; margin-bottom: 5px; }
-.stat-info p, .info-card p { color: #ccc; font-size: 0.9rem; }
-.info-card h3 { font-size: 1.5rem; } /* Smaller heading for info cards */
-
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-.page-header h2 { font-size: 1.8rem; font-weight: 600; }
-
-.btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; }
-.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
-.btn-secondary { background: #4a545c; color: white; }
-.btn-danger { background: #a93c4c; color: white; }
-.btn-warning { background: #ffc107; color: #212529; }
-
-.table-container { background: #2d2f34; border-radius: 10px; overflow-x: auto; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); }
-.data-table { width: 100%; border-collapse: collapse; }
-.data-table th, .data-table td { padding: 15px; text-align: left; border-bottom: 1px solid #444; white-space: nowrap; }
-.data-table th { background: #3a3d42; font-weight: 600; }
-.data-table tr:hover { background: #3a3d42; }
-
-.status { padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; text-transform: capitalize; }
-.status-paid, .status-active { background: #3c5e42; color: #b7e0bb; }
-.status-unpaid, .status-inactive { background: #7a464c; color: #f8d7da; }
-
-/* Modals */
-/* **MODIFIED:** Added overflow-y and padding to make the modal scrollable */
-.modal { 
-    display: none; 
-    position: fixed; 
-    z-index: 2000; 
-    left: 0; 
-    top: 0; 
-    width: 100%; 
-    height: 100%; 
-    background-color: rgba(0, 0, 0, 0.7); 
-    animation: fadeIn 0.3s ease;
-    overflow-y: auto; /* Allows the modal to scroll if content is too tall */
-    padding: 50px 0; /* Adds space at the top and bottom when scrolling */
-}
-
-.modal-content { 
-    background-color: #2d2f34; 
-    margin: 0 auto; /* Changed from 5% auto to just auto for better scroll behavior */
-    padding: 0; 
-    border-radius: 10px; 
-    width: 90%; 
-    max-width: 500px; 
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
-}
-
-.modal-header { padding: 20px 25px; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center; }
-.close { font-size: 1.5rem; cursor: pointer; }
-form { padding: 25px; }
-.form-group { margin-bottom: 20px; }
-.form-group label { display: block; margin-bottom: 5px; }
-.form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #444; background-color: #3a3d42; color: #f5f5f5; border-radius: 5px; font-size: 1rem; }
-.form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 25px; }
-
-/* Equipment & Plans */
-.equipment-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-.equipment-item { background: #2d2f34; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); text-align: center; }
-.equipment-item img { width: 100%; height: 200px; object-fit: cover; }
-.equipment-item h3 { padding: 15px; }
-.plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-.plan-card { background: #2d2f34; border-radius: 10px; padding: 25px; text-align: center; }
-.plan-card h3 { font-size: 1.5rem; }
-.plan-price { font-size: 2.5rem; font-weight: 600; color: #667eea; }
-.plan-features { list-style: none; text-align: left; }
-.plan-features li i.fa-check { color: #4caf50; }
-.plan-features li i.fa-times { color: #dc3545; }
-
-
-@media (max-width: 768px) {
-    .sidebar { transform: translateX(-100%); }
-    .sidebar.active { transform: translateX(0); }
-    .main-content { margin-left: 0; }
-    .menu-toggle { display: block; }
+    font-weight: 600;
 }
