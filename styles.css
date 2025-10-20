@@ -244,3 +244,14 @@ form { padding: 25px; }
     color: #667eea;
     font-weight: 600;
 }
+
+
+/* Calendar styles */
+.calendar { max-width: 420px; margin-top: 16px; font-family: sans-serif; }
+.cal-header { text-align: center; font-weight: 600; margin-bottom: 8px; }
+.cal-weekdays, .cal-days { display: grid; grid-template-columns: repeat(7,1fr); }
+.cal-weekdays div { text-align:center; font-size: 0.85rem; padding:6px 0; color:#555; }
+.cal-day { border:1px solid #eee; min-height:54px; padding:6px; box-sizing:border-box; display:flex; align-items:flex-start; justify-content:flex-start; }
+.cal-day.empty { background:transparent; border:none; }
+.cal-day.present { background: #d4edda; border-color:#c3e6cb; color:#155724; }
+.cal-day.absent { background: #f8d7da; border-color:#f5c6cb; color:#721c24; }
